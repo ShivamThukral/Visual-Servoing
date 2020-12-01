@@ -1,0 +1,4 @@
+std_msgs/Int64 detected_point_x
+std_msgs/Int64 detected_point_y
+std_msgs/Float64 detected_point_depth
+std_msgs/Float64 area

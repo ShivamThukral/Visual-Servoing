@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="limited" default="false"/>
+    <arg name="paused" default="false"/>
+    <arg name="gui" default="true"/>
+
+    <!-- startup simulated world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" default="$(find ur_gazebo)/world/moving_ball_world.world"/>
+        <arg name="paused" default="false"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <env name="GAZEBO_MODEL_PATH" value="$(find ur_description)/meshes:$(optenv GAZEBO_MODEL_PATH):/home/shivam/Desktop/work/robot-skills/x6_gazebo/models"/>
+    </include>
+</launch>
