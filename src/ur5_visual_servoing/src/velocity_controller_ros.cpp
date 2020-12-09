@@ -144,13 +144,6 @@ namespace gazebo {
             msg.vel4.data = this->joints[4]->GetVelocity(0);
             msg.vel5.data = this->joints[5]->GetVelocity(0);
 
-            // added shivam
-//            for(int i=0;i<NUM_OF_JOINTS;i++)
-//            {
-//                msg.robot_angles.angles.data.push_back(this->joints[i]->Position(0)) ;
-//                msg.robot_velocities.velocities.data.push_back(this->joints[i]->GetVelocity(0));
-//            }
-
             this->rosJointStatePub.publish(msg);
         }
 
@@ -162,11 +155,6 @@ namespace gazebo {
 
     private:
         void jointAngleCallback(JointAnglePtr &msg) {
-            //Shivam : change this to for loop
-//            for(int i=0;i<NUM_OF_JOINTS;i++)
-//            {
-//                this->joints[0]->SetPosition(0, msg->angles.data[i]);
-//            }
 
             this->joints[0]->SetPosition(0, msg->ang0.data);
             this->joints[1]->SetPosition(0, msg->ang1.data);
@@ -179,11 +167,7 @@ namespace gazebo {
 
     private:
         void jointVelocityCallback(JointVelocityPtr &msg) {
-            // Shivam : change this to for loop
-//            for(int i=0;i<NUM_OF_JOINTS;i++)
-//            {
-//                this->model->GetJointController()->SetVelocityTarget(this->joints[i]->GetScopedName(), msg->velocities.data[i]);
-//            }
+
             this->model->GetJointController()->SetVelocityTarget(this->joints[0]->GetScopedName(), msg->vel0.data);
             this->model->GetJointController()->SetVelocityTarget(this->joints[1]->GetScopedName(), msg->vel1.data);
             this->model->GetJointController()->SetVelocityTarget(this->joints[2]->GetScopedName(), msg->vel2.data);

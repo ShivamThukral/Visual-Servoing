@@ -498,13 +498,6 @@ void newgetFKnumerical(double th[], cv::Mat &homoTransform, bool isGripper){
     //link twist (alpha)
     double alp[6]={M_PI/2,0,0,M_PI/2,-M_PI/2,0};
 
-    //    double DH[6][4]={{th[0],d[0],a[0],alp[0]},
-    //                     {th[1],d[1],a[1],alp[1]},
-    //                     {th[2],d[2],a[2],alp[2]},
-    //                     {th[3],d[3],a[3],alp[3]},
-    //                     {th[4],d[4],a[4],alp[4]},
-    //                     {th[5],d[5],a[5],alp[5]}};
-
     Mat T = Mat::eye(4, 4, CV_64F);
 
     for (int i=0; i<6; i++)

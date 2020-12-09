@@ -38,7 +38,8 @@ int main (int argc, char** argv)
 
     //image features subscriber
     ros::Subscriber imgFeaturesSub = nh.subscribe<camshift_tracker::image_data>("/object_points", 10, imgFeatureCallback);
-
+    //Getting current feature
+    ros::spinOnce();
     sleep(1);
 
     //declaration of varibales
@@ -62,8 +63,9 @@ int main (int argc, char** argv)
 
     double kpx=1.0, kdx=0.0, kix=0.0; //PID gains
     double kpy=1.0, kdy=0.0, kiy=0.0; //PID gains
-    double kpz=1.0, kdz=0.0, kiz=0.0; //PID gains //correct
-    //double kpz=0.005, kdz=0.0, kiz=0.0; //PID gains
+    //double kpz=1.0, kdz=0.0, kiz=0.0; //PID gains //correct
+    double kpz=0.1, kdz=0.0, kiz=0.0; //PID gains //gazebo
+    //double kpz=0.0001, kdz=0.0, kiz=0.0;
 
     double dt=0,duration=0; //time and duration
     double lambda=531.15; //focal-length of camera
@@ -112,7 +114,6 @@ int main (int argc, char** argv)
     cout << "Press enter to start visual servoing " << endl;
     getchar();
 
-
     double initial_time = gazebo::common::Time::GetWallTime().Double();
     ros::Rate rate(100);
     while (ros::ok)
@@ -125,36 +126,22 @@ int main (int argc, char** argv)
         Vc.at<double>(2,0)= Error_PID.at<double>(2,0);
 
         //Way-2
-        //computeImageJacobian(m,depth_p,L);
-        //cv::invert(L, Linv, cv::DECOMP_SVD);
-        //Vc = -Linv * Error_PID;
-        cout << "Velocity: camera_frame  " << Vc << endl;
-        //duration = ros::Time::now().toSec() - total_time;
-        //cout << "-------------------------t1="<<duration<<"---------------------" << endl;
+//        computeImageJacobian(m,depth_p,L);
+//        cv::invert(L, Linv, cv::DECOMP_SVD);
+//        Vc = -Linv * Error_PID;
 
-        //Convert velocity from camera frame to end-effector frame
-        //newconvertVelCameratoEEframe(Vc,Ve);
-        //duration = ros::Time::now().toSec() - total_time;
-        //cout << "-------------------------t2="<<duration<<"---------------------" << endl;
-        //cout << "Velocity: eelink_frame  " << Ve << endl;
+        cout << "Velocity: camera_frame  " << Vc << endl;
 
         //Convert velocity from end-effector frame to base frame
         newConvertVelEEtoBaseframe(Vc,Vb);
-        //Vb.at<double>(2,0)=0.0;
-        //duration = ros::Time::now().toSec() - total_time;
-        //cout << "-------------------------t3="<<duration<<"---------------------" << endl;
         cout << "Velocity: base_frame " << Vb << endl;
+
 
         //Obtaining robot Jacobian
         ros::spinOnce();
         double th[6]={jp1g, jp2g, jp3g, jp4g, jp5g, jp6g};
-        //cout << "current joint angles " << jp1g << " " << jp2g << " " << jp3g << " " << jp4g << " " << jp5g << " " << jp6g << endl;
-        //getchar();
         getRobotJacobian(th,Jg);
-        //cout << "Jacobian " << J << endl;
-        //duration = ros::Time::now().toSec() - total_time;
-        //cout << "-------------------------t4="<<duration<<"---------------------" << endl;
-        //ROS_INFO_STREAM("Geometric Jacobian " << endl << Jg);
+        //newgetRobotJacobian(th,Jg);
 
         //Obtaining joint velocities
         cv::invert(Jg, Jg_inv, cv::DECOMP_SVD);
@@ -169,14 +156,6 @@ int main (int argc, char** argv)
         joint_velocities[3]=theta_dot.at<double>(3,0);
         joint_velocities[4]=theta_dot.at<double>(4,0);
         joint_velocities[5]=theta_dot.at<double>(5,0);
-
-        //fixed
-        //        joint_velocities[0]=0.1;
-        //        joint_velocities[1]=0;
-        //        joint_velocities[2]=0;
-        //        joint_velocities[3]=0;
-        //        joint_velocities[4]=0;
-        //        joint_velocities[5]=0;
 
         //sending velocity to gazebo controller
         double t1 =  gazebo::common::Time::GetWallTime().Double();
@@ -247,7 +226,7 @@ int main (int argc, char** argv)
         cout << "Mean Error = " << sqrt_mean_error << endl;
         cout << "-------------------------------------------------------" << endl;
 
-        if (sqrt_mean_error < 1.0 )
+        if (sqrt_mean_error < 0.05 )
             break;
 
         //Implement PID
@@ -267,7 +246,6 @@ int main (int argc, char** argv)
 
         //cout << "Check values and then press enter ... " << endl;
         //getchar();
-        //sleep(1);
     }
 
     return 0;

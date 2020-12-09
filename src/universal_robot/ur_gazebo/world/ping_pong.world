@@ -1243,10 +1243,10 @@
         </sensor>
         <visual name='camera_visual'>
           <geometry>
-            <box>
-               <!---<size>0.025 0.2 0.2</size> --->
-              <size>0.025 0.05 0.05</size>
-            </box>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>model://ur5/visual/paddle_rotated.dae</uri>
+            </mesh>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <cast_shadows>1</cast_shadows>
@@ -1274,15 +1274,35 @@
       <pose frame=''>0.109144 -0.070966 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>648 239000000</sim_time>
-      <real_time>288 1252427</real_time>
-      <wall_time>1606807568 110612653</wall_time>
-      <iterations>247498</iterations>
+      <sim_time>620 154000000</sim_time>
+      <real_time>295 604503583</real_time>
+      <wall_time>1607328464 737866306</wall_time>
+      <iterations>294346</iterations>
+      <model name='Ping Pong Table'>
+        <pose frame=''>-0.517885 1.22356 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='table'>
+          <pose frame=''>-0.517885 1.22356 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='Ping Pong Table_0'>
+        <pose frame=''>0.819998 3.36844 0 0 0 -3.13354</pose>
+        <scale>1 1 1</scale>
+        <link name='table'>
+          <pose frame=''>0.819998 3.36844 0 0 0 -3.13354</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
       <model name='box'>
-        <pose frame=''>0.323 0.975234 1.02378 0.000866 0.00135 1.56902</pose>
+        <pose frame=''>0.254022 0.975234 1.15551 0.000866 0.00135 1.56902</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>0.323 0.975234 1.02378 0.000866 0.00135 1.56902</pose>
+          <pose frame=''>0.254022 0.975234 1.15551 0.000866 0.00135 1.56902</pose>
           <velocity>-0.339085 0.234396 0.067695 -1.34931 0.867016 -1.67584</velocity>
           <acceleration>0 0 0 -0 -0 -0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -1309,9 +1329,9 @@
         </link>
         <link name='base_stand::upper_base_link'>
           <pose frame=''>0.109144 -0.070966 0.7 0 -0 0</pose>
-          <velocity>0 -0 -0 0 -0 0</velocity>
-          <acceleration>-0 -0 -0 0 -0 0</acceleration>
-          <wrench>-0 -0 -0 0 -0 0</wrench>
+          <velocity>0 -0 -0 -0 -0 -0</velocity>
+          <acceleration>-0 0 -0 0 -0 0</acceleration>
+          <wrench>-0 0 -0 0 -0 0</wrench>
         </link>
         <link name='ur5::base_link'>
           <pose frame=''>0.109144 -0.070966 1.2 0 -0 0</pose>
@@ -1320,56 +1340,46 @@
           <wrench>0 0 -0 0 -0 0</wrench>
         </link>
         <link name='ur5::camera_link'>
-          <pose frame=''>0.553457 0.134036 1.22756 -1.1e-05 0 1.57001</pose>
+          <pose frame=''>0.553465 0.134037 1.22757 -4.7e-05 0 1.57001</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 -0 -0 0 -0 0</acceleration>
-          <wrench>0 -0 -0 0 -0 0</wrench>
-        </link>
-        <link name='ur5::forearm_link'>
-          <pose frame=''>0.338769 -0.054815 1.64679 3.14159 0.570805 -3.14159</pose>
-          <velocity>-0 0 0 0 -0 0</velocity>
           <acceleration>-0 -0 -0 0 -0 0</acceleration>
           <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
+        <link name='ur5::forearm_link'>
+          <pose frame=''>0.338764 -0.054814 1.64679 3.14159 0.570836 -3.14159</pose>
+          <velocity>-0 0 0 0 -0 0</velocity>
+          <acceleration>0 -0 -0 0 -0 0</acceleration>
+          <wrench>0 -0 -0 0 -0 0</wrench>
+        </link>
         <link name='ur5::shoulder_link'>
-          <pose frame=''>0.109144 -0.070966 1.28916 0 -0 5e-06</pose>
+          <pose frame=''>0.109144 -0.070966 1.28916 0 -0 7e-06</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='ur5::upper_arm_link'>
-          <pose frame=''>0.109143 0.064884 1.28916 -0 0.570792 5e-06</pose>
+          <pose frame=''>0.109143 0.064884 1.28916 -0 0.570779 7e-06</pose>
           <velocity>-0 0 0 0 -0 0</velocity>
-          <acceleration>-0 -0 -0 0 -0 0</acceleration>
-          <wrench>-0 -0 -0 0 -0 0</wrench>
+          <acceleration>-0 0 0 0 -0 0</acceleration>
+          <wrench>-0 0 0 0 -0 0</wrench>
         </link>
         <link name='ur5::wrist_1_link'>
-          <pose frame=''>0.550707 -0.054814 1.31672 3.14159 1.1e-05 -3.14159</pose>
+          <pose frame=''>0.550713 -0.054813 1.31673 3.14159 4.7e-05 -3.14159</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 -0 -0 0 -0 0</acceleration>
           <wrench>0 -0 -0 0 -0 0</wrench>
         </link>
         <link name='ur5::wrist_2_link'>
-          <pose frame=''>0.550707 0.038186 1.31672 3.14159 1.1e-05 -3.14159</pose>
+          <pose frame=''>0.550712 0.038187 1.31673 3.14159 4.7e-05 -3.14159</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 -0 -0 0 -0 0</acceleration>
-          <wrench>0 -0 -0 0 -0 0</wrench>
+          <acceleration>-0 -0 -0 0 -0 0</acceleration>
+          <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
         <link name='ur5::wrist_3_link'>
-          <pose frame=''>0.550708 0.038186 1.22207 3.14159 1.1e-05 -3.14159</pose>
+          <pose frame=''>0.550716 0.038187 1.22208 3.14159 4.7e-05 -3.14159</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 -0 -0 0 -0 0</acceleration>
-          <wrench>0 -0 -0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='unit_box'>
-        <pose frame=''>0.543699 0.72876 1.02774 -0.050835 0.035673 -0.000908</pose>
-        <scale>0.056935 0.123459 0.239116</scale>
-        <link name='unit_box::link'>
-          <pose frame=''>0.543699 0.72876 1.02774 -0.050835 0.035673 -0.000908</pose>
-          <velocity>1e-05 1.5e-05 0.000367 -0.000125 8.8e-05 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
+          <acceleration>-0 -0 -0 0 -0 0</acceleration>
+          <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
@@ -1378,32 +1388,28 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>0.620465 -6.30646 1.57816 0 0.148 1.27879</pose>
+        <pose frame=''>-7.31139 4.23016 2.49017 0 0.083643 0.016185</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
     </gui>
     <wind/>
-    <model name='unit_box'>
-      <pose frame=''>1.4247 1.32177 0.5 0 -0 0</pose>
-      <link name='unit_box::link'>
-        <inertial>
-          <mass>1</mass>
-          <inertia>
-            <ixx>0.166667</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>0.166667</iyy>
-            <iyz>0</iyz>
-            <izz>0.166667</izz>
-          </inertia>
-          <pose frame=''>0 0 0 0 -0 0</pose>
-        </inertial>
-        <collision name='collision'>
+    <model name='Ping Pong Table'>
+      <static>1</static>
+      <link name='table'>
+        <gravity>0</gravity>
+        <visual name='visual1'>
           <geometry>
-            <box>
-              <size>1 1 1.00001</size>
-            </box>
+            <mesh>
+              <uri>file:///table/table.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision1'>
+          <geometry>
+            <mesh>
+              <uri>file:///table/table.stl</uri>
+            </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1419,23 +1425,48 @@
             </friction>
           </surface>
         </collision>
-        <visual name='visual'>
-          <geometry>
-            <box>
-              <size>1 1 1.00001</size>
-            </box>
-          </geometry>
-          <material>
-            <script>
-              <name>Gazebo/Grey</name>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-            </script>
-          </material>
-        </visual>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
+      <pose frame=''>-0.517885 1.48143 0 0 -0 0</pose>
+    </model>
+    <model name='Ping Pong Table_0'>
+      <static>1</static>
+      <link name='table'>
+        <gravity>0</gravity>
+        <visual name='visual1'>
+          <geometry>
+            <mesh>
+              <uri>file:///table/table.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision1'>
+          <geometry>
+            <mesh>
+              <uri>file:///table/table.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose frame=''>-0.615396 3.454 0 0 -0 0</pose>
     </model>
   </world>
 </sdf>

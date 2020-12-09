@@ -36,6 +36,7 @@ namespace gazebo {
                 key->Translation(ignition::math::Vector3d(x_new, 0.975, z_new));
                 key->Rotation(ignition::math::Quaterniond(0, 0, 1.5707));
             }
+
 /*
         // set starting location of the box
         key = anim->CreateKeyFrame(0);

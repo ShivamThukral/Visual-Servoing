@@ -35,33 +35,6 @@ Rect selection;
 int iLastX = 0;
 int iLastY = 0;
 double xc, yc = 0.0;
-RNG rng(12345);
-
-
-//User draws box around object to track. This triggers CAMShift to start tracking
-static void onMouse(int event, int x, int y, int, void *) {
-    if (selectObject) {
-        selection.x = MIN(x, origin.x);
-        selection.y = MIN(y, origin.y);
-        selection.width = std::abs(x - origin.x);
-        selection.height = std::abs(y - origin.y);
-
-        selection &= Rect(0, 0, image.cols, image.rows);
-    }
-
-    switch (event) {
-        case EVENT_LBUTTONDOWN:
-            origin = Point(x, y);
-            selection = Rect(x, y, 0, 0);
-            selectObject = true;
-            break;
-        case EVENT_LBUTTONUP:
-            selectObject = false;
-            if (selection.width > 0 && selection.height > 0)
-                trackObject = -1;   //Set up CAMShift properties in main() loop
-            break;
-    }
-}
 
 static void help() {
     std::cout << "\nThis is a demo that shows mean-shift based tracking using Transparent API\n"
@@ -102,7 +75,6 @@ int main(int argc, char **argv) {
     int hsize = 16;
     float hranges[] = {0, 180};
     const float *phranges = hranges;
-    vector <vector<cv::Point>> contours;
     int vmin = 47, vmax = 255, smin = 118;
 
 
@@ -171,13 +143,7 @@ int main(int argc, char **argv) {
     ros::Publisher pub = nh.advertise<camshift_tracker::image_data>("/object_points", 10);
     camshift_tracker::image_data data;
 
-    namedWindow("Histogram", 0);
     namedWindow("CamShift Demo", 0);
-    namedWindow("Control", CV_WINDOW_AUTOSIZE);
-    setMouseCallback("CamShift Demo", onMouse, 0);
-    createTrackbar("Vmin", "Control", &vmin, 255);
-    createTrackbar("Vmax", "Control", &vmax, 255);
-    createTrackbar("Smin", "Control", &smin, 255);
 
     while (image.empty() || ptcloud->empty()) {
         ros::spinOnce();
@@ -231,91 +197,86 @@ int main(int argc, char **argv) {
             predRect.y = state.at<float>(1) - predRect.height / 2;
 
             cv::Point center(state.at<float>(0),state.at<float>(1));
-            cv::circle(display_image, center, 5, CV_RGB(0, 255, 0), -1);
-            cv::rectangle(display_image, predRect, CV_RGB(0, 255, 0), 2);
+            cv::circle(display_image, center, 5, CV_RGB(255, 255, 0), -1);
+            cv::rectangle(display_image, predRect, CV_RGB(255, 255, 0), 2);
         }
 
-        if (!paused) {
-
-            cvtColor(image, hsv, COLOR_BGR2HSV);     // convert BGR to HSV
-
-            if (trackObject) {
-                //int _vmin = vmin, _vmax = vmax;
-                inRange(hsv, Scalar(0, smin, MIN(vmin, vmax)), Scalar(180, 256, MAX(vmin, vmax)),
-                        mask);        // filter out blue color as mask
-                cv::imshow("Mask", mask);
-                cv::waitKey(20);
 
 
-                cv::findContours(mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+        // >>>>> Noise smoothing
+        cv::Mat blur;
+        cv::GaussianBlur(image, blur, cv::Size(5, 5), 3.0, 3.0);
+        // <<<<< Noise smoothing
+
+        // >>>>> HSV conversion
+        cvtColor(blur, hsv, COLOR_BGR2HSV);     // convert BGR to HSV
+        // <<<<< HSV conversion
 
 
-                int ch[] = {0, 0};
-                hue.create(hsv.size(), hsv.depth());
-                mixChannels(&hsv, 1, &hue, 1, ch, 1);   //separate out hue channel
+        //int _vmin = vmin, _vmax = vmax;
+        inRange(hsv, Scalar(0, smin, MIN(vmin, vmax)), Scalar(180, 256, MAX(vmin, vmax)),
+                mask);        // filter out blue color as mask
 
-                if (trackObject < 0) {
-                    // Object has been selected by user, set up CAMShift search properties once
-                    Mat roi(hue, selection), maskroi(mask, selection);
-                    calcHist(&roi, 1, 0, maskroi, hist, 1, &hsize, &phranges);
-                    normalize(hist, hist, 0, 255, NORM_MINMAX);
+        // >>>>> Improving the result
+        cv::erode(mask, mask, cv::Mat(), cv::Point(-1, -1), 2);
+        cv::dilate(mask, mask, cv::Mat(), cv::Point(-1, -1), 2);
+        // <<<<< Improving the result
 
-                    trackWindow = selection;
-                    trackObject = 1; // Don't set up again, unless user selects new ROI
-                    startProcessingImage = true;
-                    time = ros::Time::now().toSec();
+        cv::imshow("Mask", mask);
+        cv::waitKey(20);
 
-                    histimg = Scalar::all(0);
-                    int binW = histimg.cols / hsize;
-                    Mat buf(1, hsize, CV_8UC3);
-                    for (int i = 0; i < hsize; i++)
-                        buf.at<Vec3b>(i) = Vec3b(saturate_cast<uchar>(i * 180. / hsize), 255, 255);
-                    cvtColor(buf, buf, COLOR_HSV2BGR);
+        // >>>>> Contours detection
+        vector<vector<cv::Point> > contours;
+        cv::findContours(mask, contours, CV_RETR_EXTERNAL,
+                         CV_CHAIN_APPROX_NONE);
+        // <<<<< Contours detection
 
-                    for (int i = 0; i < hsize; i++) {
-                        int val = saturate_cast<int>(hist.at<float>(i) * histimg.rows / 255);
-                        rectangle(histimg, Point(i * binW, histimg.rows),
-                                  Point((i + 1) * binW, histimg.rows - val),
-                                  Scalar(buf.at<Vec3b>(i)), -1, 8);
-                    }
-                }
+        // >>>>> Filtering
+        vector<vector<cv::Point> > balls;
+        vector<cv::Rect> ballsBox;
+        for (size_t i = 0; i < contours.size(); i++)
+        {
+            cv::Rect bBox;
+            bBox = cv::boundingRect(contours[i]);
 
-                if (contours.size() != 0) {
+            float ratio = (float) bBox.width / (float) bBox.height;
+            if (ratio > 1.0f)
+                ratio = 1.0f / ratio;
 
-                    // Perform CAMShift
-                    calcBackProject(&hue, 1, 0, hist, backproj, &phranges);
-                    backproj &= mask;
-
-                    RotatedRect trackBox = CamShift(backproj, trackWindow,
-                                                    TermCriteria(TermCriteria::EPS | TermCriteria::COUNT, 10, 1));
-
-                    iLastX = trackBox.center.x;
-                    iLastY = trackBox.center.y;
-                    cv::circle(display_image, Point(iLastX, iLastY), 4, Scalar(0, 0, 255), 5, 8);
-
-                    if (trackWindow.area() <= 1) {
-                        int cols = backproj.cols, rows = backproj.rows, r = (MIN(cols, rows) + 5) / 6;
-                        trackWindow = Rect(trackWindow.x - r, trackWindow.y - r,
-                                           trackWindow.x + r, trackWindow.y + r) &
-                                      Rect(0, 0, cols, rows);
-                        ROS_INFO("out of camera scope");
-                    }
-
-                    if (backprojMode)
-                        cvtColor(backproj, image, COLOR_GRAY2BGR);
-                    ellipse(display_image, trackBox, Scalar(0, 0, 255), 3, CV_AA);
-                }
+            // Searching for a bBox almost square
+            if (ratio > 0.75 && bBox.area() >= 400)
+            {
+                balls.push_back(contours[i]);
+                ballsBox.push_back(bBox);
             }
-        } else if (trackObject < 0)
-            paused = false;
-
-        if (selectObject && selection.width > 0 && selection.height > 0) {
-            Mat roi(image, selection);
-            bitwise_not(roi, roi);
         }
+        // <<<<< Filtering
 
+        cout << "Balls found:" << ballsBox.size() << endl;
+
+        // >>>>> Detection result
+        for (size_t i = 0; i < balls.size(); i++)
+        {
+            cout<<"check"<<endl;
+            cv::drawContours(display_image, balls, i, CV_RGB(20,150,20), 1);
+            cv::rectangle(display_image, ballsBox[i], CV_RGB(0,255,0), 2);
+
+            cv::Point center;
+            center.x = ballsBox[i].x + ballsBox[i].width / 2;
+            center.y = ballsBox[i].y + ballsBox[i].height / 2;
+            cv::circle(display_image, center, 2, CV_RGB(20,150,20), -1);
+
+            stringstream sstr;
+            sstr << "(" << center.x << "," << center.y << ")";
+            cv::putText(display_image, sstr.str(),
+                        cv::Point(center.x + 3, center.y - 3),
+                        cv::FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(20,150,20), 2);
+        }
+        // <<<<< Detection result
+
+        cout<<"check2"<<endl;
         // >>>>> Kalman Update
-        if (contours.size() == 0) {
+        if (balls.size() == 0) {
 
             notFoundCount++;
             //cout << "notFoundCount:" << notFoundCount << endl;
@@ -328,10 +289,10 @@ int main(int argc, char **argv) {
         } else {
             notFoundCount = 0;
 
-            measurement.at<float>(0) = iLastX;
-            measurement.at<float>(1) = iLastY;
-            measurement.at<float>(2) = selection.width;
-            measurement.at<float>(3) = selection.height;
+            measurement.at<float>(0) = ballsBox[0].x + ballsBox[0].width / 2;
+            measurement.at<float>(1) = ballsBox[0].y + ballsBox[0].height / 2;
+            measurement.at<float>(2) = (float)ballsBox[0].width;
+            measurement.at<float>(3) = (float)ballsBox[0].height;
 
             if (!found) // First detection!
             {
@@ -373,36 +334,12 @@ int main(int argc, char **argv) {
         cv::waitKey(20);
 
 
-        if (contours.size() == 0 && trackWindow.area() <= 1) {
+        if (balls.size() == 0 ) {
             xc = estimatedState.at<float>(0);
             yc = estimatedState.at<float>(1);
         } else {
-            xc = iLastX;
-            yc = iLastY;
-        }
-
-        char c = (char) waitKey(10);
-        if (c == 27)
-            break;
-        switch (c) {
-            case 'b':
-                backprojMode = !backprojMode;
-                break;
-            case 'c':
-                trackObject = 0;
-                histimg = Scalar::all(0);
-                break;
-            case 'h':
-                showHist = !showHist;
-                if (!showHist)
-                    destroyWindow("Histogram");
-                else
-                    namedWindow("Histogram", 1);
-                break;
-            case 'p':
-                paused = !paused;
-                break;
-            default:;
+            xc = ballsBox[0].x + ballsBox[0].width / 2;
+            yc = ballsBox[0].y + ballsBox[0].height / 2;
         }
 
         // if the pixel coordinates are out of bounds return default value

@@ -126,20 +126,9 @@ int main (int argc, char** argv)
         Vc.at<double>(0,0)= (depth_p[0]/lambda)*Error_PID.at<double>(0,0);
         Vc.at<double>(1,0)= (depth_p[1]/lambda)*Error_PID.at<double>(1,0);
 
-        //Way-2
-        //computeImageJacobian(m,depth_p,L);
-        //cv::invert(L, Linv, cv::DECOMP_SVD);
-        //Vc = -Linv * Error_PID;
 
         cout << "Velocity: camera_frame  " << Vc << endl;
-        //duration = ros::Time::now().toSec() - total_time;
-        //cout << "-------------------------t1="<<duration<<"---------------------" << endl;
 
-        //Convert velocity from camera frame to end-effector frame
-        //newconvertVelCameratoEEframe(Vc,Ve);
-        //duration = ros::Time::now().toSec() - total_time;
-        //cout << "-------------------------t2="<<duration<<"---------------------" << endl;
-        //cout << "Velocity: eelink_frame  " << Ve << endl;
 
         //Convert velocity from end-effector frame to base frame
         newConvertVelEEtoBaseframe(Vc,Vb);

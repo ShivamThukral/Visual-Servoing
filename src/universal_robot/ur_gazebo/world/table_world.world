@@ -1245,7 +1245,7 @@
           <geometry>
             <mesh>
               <scale>1 1 1</scale>
-              <uri>model://ur5/visual/racket.dae</uri>
+              <uri>model://ur5/visual/paddle_rotated.dae</uri>
             </mesh>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1401,14 +1401,14 @@
         <visual name='visual1'>
           <geometry>
             <mesh>
-              <uri>file:///home/shivam/Desktop/work/robot-skills/x6_gazebo/models/table/table.dae</uri>
+              <uri>file:///table/table.dae</uri>
             </mesh>
           </geometry>
         </visual>
         <collision name='collision1'>
           <geometry>
             <mesh>
-              <uri>file:///home/shivam/Desktop/work/robot-skills/x6_gazebo/models/table/table.stl</uri>
+              <uri>file:///table/table.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -1438,14 +1438,14 @@
         <visual name='visual1'>
           <geometry>
             <mesh>
-              <uri>file:///home/shivam/Desktop/work/robot-skills/x6_gazebo/models/table/table.dae</uri>
+              <uri>file:///table/table.dae</uri>
             </mesh>
           </geometry>
         </visual>
         <collision name='collision1'>
           <geometry>
             <mesh>
-              <uri>file:///home/shivam/Desktop/work/robot-skills/x6_gazebo/models/table/table.stl</uri>
+              <uri>file:///table/table.stl</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>

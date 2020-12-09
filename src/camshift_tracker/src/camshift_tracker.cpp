@@ -175,6 +175,9 @@ int main( int argc, char** argv )
             {
                 int _vmin = vmin, _vmax = vmax;
                 inRange(hsv, Scalar(0, smin, MIN(_vmin,_vmax)), Scalar(180, 256, MAX(_vmin, _vmax)), mask);
+
+
+
                 cv::imshow("Mask", mask);
 
                 int ch[] = {0, 0};

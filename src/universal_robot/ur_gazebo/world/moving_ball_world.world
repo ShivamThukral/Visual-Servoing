@@ -1223,7 +1223,8 @@
         <visual name='camera_visual'>
           <geometry>
           <box>
-                <size>0.025 0.2 0.2</size>
+                <!---<size>0.025 0.2 0.2</size> --->
+                <size>0.025 0.05 0.05</size>
           </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
