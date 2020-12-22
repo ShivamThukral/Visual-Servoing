@@ -29,27 +29,25 @@ int main (int argc, char** argv)
 {
     ros::init(argc,argv,"velcoity_test_node");
     ros::NodeHandle nh;
-
+    // subscribers from velocity controller
     ros::Subscriber jointStateSub = nh.subscribe("/my_joint_states",10,jointStateCallbackGazebo);
-
+    // publisher to velocity controller
     ros::Publisher JointVelPub = nh.advertise<ur5_visual_servoing::joint_vel>("/joint_vel_cmd",1);
     ros::Publisher JointAngPub = nh.advertise<ur5_visual_servoing::joint_angles>("/joint_angles_cmd",1);
     ros::Publisher SimVarPub = nh.advertise<ur5_visual_servoing::sim_variables>("/sim_variables_cmd",1);
 
-    //image features subscriber
+    //image features subscriber for the object features
     ros::Subscriber imgFeaturesSub = nh.subscribe<camshift_tracker::image_data>("/object_points", 10, imgFeatureCallback);
     sleep(1);
 
     //declaration of varibales
-    Mat Error = Mat(2, 1, CV_64F, 0.0);
+    Mat Error = Mat(2, 1, CV_64F, 0.0);      // error between the current and desired features.
     Mat Pterm = Mat(2, 1, CV_64F, 0.0);
     Mat Iterm = Mat(2, 1, CV_64F, 0.0);
     Mat Dterm = Mat(2, 1, CV_64F, 0.0);
     Mat Pre_Error = Mat(2, 1, CV_64F, 0.0);
     Mat Error_PID = Mat(2, 1, CV_64F, 0.0);
 
-    Mat L = Mat(2, 6, CV_64F, 0.0);
-    Mat Linv = Mat(6, 2, CV_64F, 0.0);
     Mat Vc = Mat(6, 1, CV_64F, 0.0);
     Mat Ve = Mat(6, 1, CV_64F, 0.0);
     Mat Vb = Mat(6, 1, CV_64F, 0.0);
@@ -60,20 +58,20 @@ int main (int argc, char** argv)
     Mat Vc_real = Mat(6,1, CV_64F, 0.0);
 
     double kpx=1.0, kdx=0.0, kix=0.0; //PID gains
-    double kpy=1.0, kdy=0.0, kiy=0.0; //PID gains
+    double kpy=0.5, kdy=0.0, kiy=0.0; //PID gains
     double dt=0,duration=0; //time and duration
     double lambda=531.15; //focal-length of camera
 
     //Getting current feature
     ros::spinOnce();
     double u_c[2]={0,0};
-    u_c[0]=x_point, u_c[1]=y_point;
+    u_c[0]=x_point, u_c[1]=y_point;             // from the camshift algorithm
+
     double depth_p[2]={0,0}, prev_depth[2]; //depth of centroid
-    //depth_p[0]=(double)centroid_depth, depth_p[1]=(double)centroid_depth;
     depth_p[0]=0.7, depth_p[1]=0.7;
     prev_depth[0]=depth_p[0], prev_depth[1]=depth_p[1];
 
-    double m[2]={0,0};
+    double m[2]={0,0};                  //measured features
     m[0]= (u_c[0]-320)/(531.15/640);    //(u-u0)/px
     m[1]= (u_c[1]-240)/(531.15/480);    //(v-v0)/py
 
@@ -86,12 +84,13 @@ int main (int argc, char** argv)
 
     //Error
     double mean_error = 0;
-    for(int i = 0; i < 2; i++)
+    for(int i = 0; i < 2; i++)    // error across x and y in current and desired features
     {
         Error.at<double>(i,0) = m[i]-m_d[i];
         mean_error = mean_error + Error.at<double>(i,0)*Error.at<double>(i,0);
     }
     double sqrt_mean_error = sqrt(mean_error);
+
     Error_PID.at<double>(0,0)=kpx*Error.at<double>(0,0);
     Error_PID.at<double>(1,0)=kpy*Error.at<double>(1,0);
 
@@ -104,16 +103,16 @@ int main (int argc, char** argv)
     getchar();
 
     //file for writing image features
-//    ofstream f1, f2, f3, f4;
-//    f1.open("/home/mithun/ur_vs_gazebo/src/ur5_vs/src/results/trackedfeatures.txt",std::ios_base::trunc);
-//    f2.open("/home/mithun/ur_vs_gazebo/src/ur5_vs/src/results/joint_velocities.txt",std::ios_base::trunc);
-//    f3.open("/home/mithun/ur_vs_gazebo/src/ur5_vs/src/results/error.txt",std::ios_base::trunc);
-//    f4.open("/home/mithun/ur_vs_gazebo/src/ur5_vs/src/results/camera_vel.txt",std::ios_base::trunc);
-//
-//    f1 << duration << "\t" << m[0] << "\t" << m[1] << endl;
-//    f2 << duration << "\t" << theta_dot.at<double>(0) << "\t"<< theta_dot.at<double>(1) << "\t"<< theta_dot.at<double>(2) << "\t"<< theta_dot.at<double>(3) << "\t"<< theta_dot.at<double>(4) << "\t"<< theta_dot.at<double>(5) << endl;  //saving joint velocities velocities to file
-//    f3 << duration << "\t" << abs(Error.at<double>(0,0)) << "\t"<< abs(Error.at<double>(1,0)) << "\t" << sqrt_mean_error << endl;  //saving error to file
-//    f4 << duration << "\t" << Vc_real.at<double>(0) << "\t"<< Vc_real.at<double>(1) << "\t"<< Vc_real.at<double>(2) << "\t"<< Vc_real.at<double>(3) << "\t"<< Vc_real.at<double>(4) << "\t"<< Vc_real.at<double>(5) << endl;  //saving camera velocities velocities to file
+    ofstream f1, f2, f3, f4;
+    f1.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/trackedfeatures.txt",std::ios_base::trunc);
+    f2.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/joint_velocities.txt",std::ios_base::trunc);
+    f3.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/error.txt",std::ios_base::trunc);
+    f4.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/camera_vel.txt",std::ios_base::trunc);
+
+    f1 << duration << "\t" << m[0] << "\t" << m[1] << endl;
+    f2 << duration << "\t" << theta_dot.at<double>(0) << "\t"<< theta_dot.at<double>(1) << "\t"<< theta_dot.at<double>(2) << "\t"<< theta_dot.at<double>(3) << "\t"<< theta_dot.at<double>(4) << "\t"<< theta_dot.at<double>(5) << endl;  //saving joint velocities velocities to file
+    f3 << duration << "\t" << abs(Error.at<double>(0,0)) << "\t"<< abs(Error.at<double>(1,0)) << "\t" << sqrt_mean_error << endl;  //saving error to file
+    f4 << duration << "\t" << Vc_real.at<double>(0) << "\t"<< Vc_real.at<double>(1) << "\t"<< Vc_real.at<double>(2) << "\t"<< Vc_real.at<double>(3) << "\t"<< Vc_real.at<double>(4) << "\t"<< Vc_real.at<double>(5) << endl;  //saving camera velocities velocities to file
 
     double initial_time = gazebo::common::Time::GetWallTime().Double();
     ros::Rate rate(100);
@@ -125,10 +124,7 @@ int main (int argc, char** argv)
         //Way-1
         Vc.at<double>(0,0)= (depth_p[0]/lambda)*Error_PID.at<double>(0,0);
         Vc.at<double>(1,0)= (depth_p[1]/lambda)*Error_PID.at<double>(1,0);
-
-
         cout << "Velocity: camera_frame  " << Vc << endl;
-
 
         //Convert velocity from end-effector frame to base frame
         newConvertVelEEtoBaseframe(Vc,Vb);
@@ -204,9 +200,9 @@ int main (int argc, char** argv)
         //        std::cout << "-----------------------------\n";
 
 #endif
-//        f2 << duration << "\t" << jv1g << "\t"<< jv2g << "\t"<< jv3g << "\t"<< jv4g << "\t"<< jv5g << "\t"<< jv6g << endl;  //saving joint velocities velocities to file
+        f2 << duration << "\t" << jv1g << "\t"<< jv2g << "\t"<< jv3g << "\t"<< jv4g << "\t"<< jv5g << "\t"<< jv6g << endl;  //saving joint velocities velocities to file
         getRealCameraVel(Vc_real);
-//        f4 << duration << "\t" << Vc_real.at<double>(0) << "\t"<< Vc_real.at<double>(1) << "\t"<< Vc_real.at<double>(2) << "\t"<< Vc_real.at<double>(3) << "\t"<< Vc_real.at<double>(4) << "\t"<< Vc_real.at<double>(5) << endl;  //saving camera velocities velocities to file
+        f4 << duration << "\t" << Vc_real.at<double>(0) << "\t"<< Vc_real.at<double>(1) << "\t"<< Vc_real.at<double>(2) << "\t"<< Vc_real.at<double>(3) << "\t"<< Vc_real.at<double>(4) << "\t"<< Vc_real.at<double>(5) << endl;  //saving camera velocities velocities to file
 
         //finding current error
         ros::spinOnce();
@@ -240,7 +236,7 @@ int main (int argc, char** argv)
 
         sqrt_mean_error = sqrt(mean_error);
 
-  //      f3 << duration << "\t" << abs(Error.at<double>(0,0)) << "\t"<< abs(Error.at<double>(1,0)) << "\t" << sqrt_mean_error << endl;  //saving error to file
+        f3 << duration << "\t" << abs(Error.at<double>(0,0)) << "\t"<< abs(Error.at<double>(1,0)) << "\t" << sqrt_mean_error << endl;  //saving error to file
 
         duration = gazebo::common::Time::GetWallTime().Double() - initial_time;
         cout << "-------------------------t="<<duration<<"---------------------" << endl;
@@ -248,7 +244,7 @@ int main (int argc, char** argv)
         cout << "Desired Feature = [" << m_d[0] << " " << m_d[1] << "]" << endl;
         cout << "Mean Error = " << sqrt_mean_error << endl;
         cout << "-------------------------------------------------------" << endl;
- //       f1 << duration << "\t" << m[0] << "\t" << m[1] << "\n";
+        f1 << duration << "\t" << m[0] << "\t" << m[1] << "\n";
 
         //if (sqrt_mean_error == 0)
             //break;
@@ -265,7 +261,14 @@ int main (int argc, char** argv)
         cout << "PID terms " << Pterm << " " << Iterm << " " << Dterm << endl;
         //cout << "Error PID terms " << kp*Pterm << " " << ki*Iterm << " " << kd*Dterm << endl;
         cout << "Error PID " << Error_PID << endl;
+
+//        if(sqrt_mean_error <= 0.0001)
+//            break;
     }
+    f1.close();
+    f2.close();
+    f3.close();
+    f4.close();
 
     return 0;
 }

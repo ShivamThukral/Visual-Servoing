@@ -22,6 +22,12 @@ find_package(catkin REQUIRED COMPONENTS
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package( PCL REQUIRED )
 find_package(OpenCV REQUIRED)
+find_package(gazebo REQUIRED)
+
+include (FindPkgConfig)
+if (PKG_CONFIG_FOUND)
+ pkg_check_modules(GAZEBO gazebo)
+endif()
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -126,9 +132,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  ${GAZEBO_INCLUDE_DIRS}
 
 )
-
+link_directories(${GAZEBO_LIBRARY_DIRS})
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/camshift_tracker.cpp
@@ -165,8 +172,12 @@ target_link_libraries(camshift_tracker ${catkin_LIBRARIES} ${OpenCV_LIBS} )
 
 #Executable for Camshift + kalman-filter-algorithim
 add_executable(camshift_kalman_tracker src/camshift_kalman_tracker.cpp)
-add_dependencies(camshift_kalman_tracker ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(camshift_kalman_tracker ${catkin_LIBRARIES} ${OpenCV_LIBS} )
+add_dependencies(camshift_kalman_tracker ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${GAZEBO_LIBRARIES})
+target_link_libraries(camshift_kalman_tracker ${catkin_LIBRARIES} ${OpenCV_LIBS} ${GAZEBO_LIBRARIES})
+
+add_executable(camshift_kalman_updated src/camshift_kalman_updated.cpp)
+add_dependencies(camshift_kalman_updated ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(camshift_kalman_updated ${catkin_LIBRARIES} ${OpenCV_LIBS} )
 
 #############
 ## Install ##

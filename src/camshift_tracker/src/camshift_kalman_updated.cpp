@@ -18,7 +18,6 @@
 #include <camshift_tracker/image_data.h>
 #include <iostream>
 #include <ctype.h>
-#include <gazebo/gazebo.hh>
 
 using namespace cv;
 using namespace std;
@@ -81,21 +80,21 @@ int main(int argc, char **argv) {
 
     // Kalman Filter
     int STATE_SIZE = 6;             // size of the state vector
-    int MEASUREMENT_SIZE = 4;       // states which we can measure
+    int MEASUREMENT_SIZE = 2;       // states which we can measure
     int CONTROL_SIZE = 0;           // control input size
 
     cv::KalmanFilter kf(STATE_SIZE, MEASUREMENT_SIZE, CONTROL_SIZE, CV_32F);
-    cv::Mat state(STATE_SIZE, 1, CV_32F);                       // Actual state vector [x,y,v_x,v_y,w,h]
+    cv::Mat state(STATE_SIZE, 1, CV_32F);                       // Actual state vector [x,y,v_x,v_y,x_a,y_a]
     cv::Mat estimatedState(STATE_SIZE, 1, CV_32F);              // Estimate State vector by kalman filter
 
-    cv::Mat measurement(MEASUREMENT_SIZE, 1, CV_32F);    // [z_x,z_y,z_w,z_h]
+    cv::Mat measurement(MEASUREMENT_SIZE, 1, CV_32F);    // [z_x,z_y,0,0]
 
     // Transition State Matrix A
     // Note: set dT at each processing step!
-    // [ 1 0 dT 0  0 0 ]
-    // [ 0 1 0  dT 0 0 ]
-    // [ 0 0 1  0  0 0 ]
-    // [ 0 0 0  1  0 0 ]
+    // [ 1 0 dT 0  dT/2 0 ]
+    // [ 0 1 0  dT 0 dT/2 ]
+    // [ 0 0 1  0  dT 0 ]
+    // [ 0 0 0  1  0 dT ]
     // [ 0 0 0  0  1 0 ]
     // [ 0 0 0  0  0 1 ]
     cv::setIdentity(kf.transitionMatrix);
@@ -103,13 +102,13 @@ int main(int argc, char **argv) {
     // Measure Matrix H
     // [ 1 0 0 0 0 0 ]
     // [ 0 1 0 0 0 0 ]
-    // [ 0 0 0 0 1 0 ]
-    // [ 0 0 0 0 0 1 ]
+    // [ 0 0 0 0 0 0 ]
+    // [ 0 0 0 0 0 0 ]
     kf.measurementMatrix = cv::Mat::zeros(MEASUREMENT_SIZE, STATE_SIZE, CV_32F);
     kf.measurementMatrix.at<float>(0) = 1.0f;
     kf.measurementMatrix.at<float>(7) = 1.0f;
-    kf.measurementMatrix.at<float>(16) = 1.0f;
-    kf.measurementMatrix.at<float>(23) = 1.0f;
+    //kf.measurementMatrix.at<float>(16) = 1.0f;
+    //kf.measurementMatrix.at<float>(23) = 1.0f;
 
     // Process Noise Covariance Matrix Q
     // [ Ex   0   0     0     0    0  ]
@@ -122,8 +121,8 @@ int main(int argc, char **argv) {
     kf.processNoiseCov.at<float>(7) = 1e-2;
     kf.processNoiseCov.at<float>(14) = 5.0f;
     kf.processNoiseCov.at<float>(21) = 5.0f;
-    kf.processNoiseCov.at<float>(28) = 1e-2;
-    kf.processNoiseCov.at<float>(35) = 1e-2;
+    kf.processNoiseCov.at<float>(28) = 5.0f;
+    kf.processNoiseCov.at<float>(35) = 5.0f;
 
     //Measures Noise Covariance Matrix R
     cv::setIdentity(kf.measurementNoiseCov, cv::Scalar(1e-1));
@@ -164,14 +163,6 @@ int main(int argc, char **argv) {
     bool startProcessingImage = false;
     double time, total_time = 10.0;
 
-    ofstream f1, f2;
-    f1.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/camshift.txt",std::ios_base::trunc);
-    f2.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/kalman.txt",std::ios_base::trunc);
-    double initial_time = gazebo::common::Time::GetWallTime().Double();
-    double duration = 0.0;
-
-
-
 
     while (ros::ok()) {
         pcl::PointXYZRGB pt;
@@ -192,14 +183,19 @@ int main(int argc, char **argv) {
             //cout << "Inside Prediction: dT value set. " << endl;
             kf.transitionMatrix.at<float>(2) = dT;
             kf.transitionMatrix.at<float>(9) = dT;
+            kf.transitionMatrix.at<float>(2,4) = dT;
+            kf.transitionMatrix.at<float>(3,5) = dT;
+            kf.transitionMatrix.at<float>(0,4) = dT/2.0;
+            kf.transitionMatrix.at<float>(1,5) = dT/2.0;
+
+
             // <<<< Matrix A
             cout << "dT:" << dT << endl;
             state = kf.predict();
-            cout << "State ([x,y,v_x,v_y,w,h]) : " << state.at<float>(0, 0) << " "
-                             << state.at<float>(1, 0) << " " << state.at<float>(2, 0) << " "
-                             << state.at<float>(3, 0) << " " << state.at<float>(4, 0) << " "
-                             << state.at<float>(5, 0) << endl;
-            //f2 << duration << "\t" << state.at<float>(0, 0)  << "\t"<< state.at<float>(1, 0)  << endl;  //saving error to file
+            cout << "State ([x,y,v_x,v_y,a_x,a_y]) : " << state.at<float>(0, 0) << " "
+                 << estimatedState.at<float>(1, 0) << " " << state.at<float>(2, 0) << " "
+                 << state.at<float>(3, 0) << " " << state.at<float>(4, 0) << " "
+                 << state.at<float>(5, 0) << endl;
             cv::Rect predRect;
             predRect.width = state.at<float>(4);
             predRect.height = state.at<float>(5);
@@ -209,7 +205,6 @@ int main(int argc, char **argv) {
             cv::Point center(state.at<float>(0),state.at<float>(1));
             cv::circle(display_image, center, 5, CV_RGB(255, 255, 0), -1);
             cv::rectangle(display_image, predRect, CV_RGB(255, 255, 0), 2);
-            f2 << duration << "\t" << state.at<float>(0)  << "\t"<< state.at<float>(1)  << endl;  //saving error to file
         }
 
 
@@ -334,7 +329,6 @@ int main(int argc, char **argv) {
                      << estimatedState.at<float>(1, 0) << " " << estimatedState.at<float>(2, 0) << " "
                      << estimatedState.at<float>(3, 0) << " " << estimatedState.at<float>(4, 0) << " "
                      << estimatedState.at<float>(5, 0) << endl;
-
             }
 
             cout << "Measure matrix [z_x,z_y,z_w,z_h] : " << measurement.at<float>(0, 0) << " "
@@ -352,8 +346,6 @@ int main(int argc, char **argv) {
         } else {
             xc = ballsBox[0].x + ballsBox[0].width / 2;
             yc = ballsBox[0].y + ballsBox[0].height / 2;
-            f1 << duration << "\t" << xc << "\t"<< yc  << endl;  //saving error to file
-
         }
 
         // if the pixel coordinates are out of bounds return default value
@@ -372,7 +364,7 @@ int main(int argc, char **argv) {
         cout << "depth = " << float(depth) << endl;
         cout << "centroid (pixel) " << xc << " " << yc << endl;
         cout << "centroid (image) " << image_coordinates[0] << " " << image_coordinates[1] << endl;
-        duration = gazebo::common::Time::GetWallTime().Double() - initial_time;
+
 
 
         //writing to a msg
@@ -380,14 +372,13 @@ int main(int argc, char **argv) {
         data.detected_point_y.data = yc;
         data.detected_point_depth.data = (float) pt.z;
 
+
+
         pub.publish(data);
         cout << "Published Image data" << endl;
         ros::spinOnce();
 
     }
-
-    f1.close();
-    f2.close();
     return 0;
 }
 

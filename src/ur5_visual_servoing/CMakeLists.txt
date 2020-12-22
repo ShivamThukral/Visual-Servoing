@@ -157,7 +157,7 @@ catkin_package(
         INCLUDE_DIRS include
         LIBRARIES ur5_ik
         CATKIN_DEPENDS roscpp rospy std_msgs
-        DEPENDS system_lib
+        DEPENDS
         geometry_msgs
         visualization_msgs
         message_runtime
@@ -216,6 +216,13 @@ target_link_libraries(velocity_controller_ros ${catkin_LIBRARIES} ${GAZEBO_libra
 
 add_library(ball_animation_plugin SHARED src/ball_animation_plugin.cpp)
 target_link_libraries(ball_animation_plugin ${catkin_LIBRARIES} ${GAZEBO_libraries} ${roscpp_LIBRARIES})
+
+add_library(ping_pong_ball_plugin SHARED src/ping_pong_ball_animation.cpp)
+target_link_libraries(ping_pong_ball_plugin ${catkin_LIBRARIES} ${GAZEBO_libraries} ${roscpp_LIBRARIES})
+
+#executable for plotting features
+add_executable(draw src/draw.cpp src/gnuplot_ci.cpp )
+target_link_libraries(draw ${catkin_LIBRARIES})
 
 #############
 ## Install ##

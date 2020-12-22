@@ -61,8 +61,8 @@ int main (int argc, char** argv)
     Mat theta_dot = Mat(6,1, CV_64F, 0.0);
     Mat Vc_real = Mat(6,1, CV_64F, 0.0);
 
-    double kpx=1.0, kdx=0.0, kix=0.0; //PID gains
-    double kpy=1.0, kdy=0.0, kiy=0.0; //PID gains
+    double kpx=0.3, kdx=0.2, kix=0.0; //PID gains
+    double kpy=0.3, kdy=0.2, kiy=0.0; //PID gains
     //double kpz=1.0, kdz=0.0, kiz=0.0; //PID gains //correct
     double kpz=0.1, kdz=0.0, kiz=0.0; //PID gains //gazebo
     //double kpz=0.0001, kdz=0.0, kiz=0.0;
@@ -113,6 +113,19 @@ int main (int argc, char** argv)
     cout << "-------------------------------------------------------" << endl;
     cout << "Press enter to start visual servoing " << endl;
     getchar();
+
+    //file for writing image features
+    ofstream f1, f2, f3, f4;
+    f1.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/trackedfeatures.txt",std::ios_base::trunc);
+    f2.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/joint_velocities.txt",std::ios_base::trunc);
+    f3.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/error.txt",std::ios_base::trunc);
+    f4.open("/home/vcr/UBC/Research/simulation/ibvs_ws/results/camera_vel.txt",std::ios_base::trunc);
+
+    f1 << duration << "\t" << m[0] << "\t" << m[1]  << "\t" << m[2] << endl;
+    f2 << duration << "\t" << theta_dot.at<double>(0) << "\t"<< theta_dot.at<double>(1) << "\t"<< theta_dot.at<double>(2) << "\t"<< theta_dot.at<double>(3) << "\t"<< theta_dot.at<double>(4) << "\t"<< theta_dot.at<double>(5) << endl;  //saving joint velocities velocities to file
+    f3 << duration << "\t" << abs(Error.at<double>(0,0)) << "\t"<< abs(Error.at<double>(1,0)) << "\t" << abs(Error.at<double>(2,0)) << "\t" << sqrt_mean_error << endl;  //saving error to file
+    f4 << duration << "\t" << Vc_real.at<double>(0) << "\t"<< Vc_real.at<double>(1) << "\t"<< Vc_real.at<double>(2) << "\t"<< Vc_real.at<double>(3) << "\t"<< Vc_real.at<double>(4) << "\t"<< Vc_real.at<double>(5) << endl;  //saving camera velocities velocities to file
+
 
     double initial_time = gazebo::common::Time::GetWallTime().Double();
     ros::Rate rate(100);
@@ -182,7 +195,9 @@ int main (int argc, char** argv)
         std::cout << "Joint Velocities Applied for : " <<  t << " seconds"<<std::endl;
 
 #endif
+        f2 << duration << "\t" << jv1g << "\t"<< jv2g << "\t"<< jv3g << "\t"<< jv4g << "\t"<< jv5g << "\t"<< jv6g << endl;  //saving joint velocities velocities to file
         getRealCameraVel(Vc_real);
+        f4 << duration << "\t" << Vc_real.at<double>(0) << "\t"<< Vc_real.at<double>(1) << "\t"<< Vc_real.at<double>(2) << "\t"<< Vc_real.at<double>(3) << "\t"<< Vc_real.at<double>(4) << "\t"<< Vc_real.at<double>(5) << endl;  //saving camera velocities velocities to file
 
         //finding current error
         ros::spinOnce();
@@ -217,7 +232,7 @@ int main (int argc, char** argv)
         }
 
         sqrt_mean_error = sqrt(mean_error);
-
+        f3 << duration << "\t" << abs(Error.at<double>(0,0)) << "\t"<< abs(Error.at<double>(1,0)) << "\t" << abs(Error.at<double>(2,0)) << "\t" << sqrt_mean_error << endl;  //saving error to file
 
         duration = gazebo::common::Time::GetWallTime().Double() - initial_time;
         cout << "-------------------------t="<<duration<<"---------------------------" << endl;
@@ -225,8 +240,8 @@ int main (int argc, char** argv)
         cout << "Desired Feature = [" << m_d[0] << " " << m_d[1] << " " << m_d[2]  << "]" << endl;
         cout << "Mean Error = " << sqrt_mean_error << endl;
         cout << "-------------------------------------------------------" << endl;
-
-        if (sqrt_mean_error < 0.05 )
+        f1 << duration << "\t" << m[0] << "\t" << m[1] << "\t" << m[2] << "\n";
+        if (sqrt_mean_error < 0.1 )
             break;
 
         //Implement PID

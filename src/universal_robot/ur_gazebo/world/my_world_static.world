@@ -74,7 +74,7 @@
 	      <!--pose frame=''>0.2 0.975 1.0 0 -0 0</pose--> <!--bottom left corner-->
 	      <!--pose frame=''>0.8 0.975 1.0 0 -0 0</pose--> <!--bottom right corner-->
 	      <!--pose frame=''>0.7 0.7 1.35 0 -0 0</pose--> <!--testing depth top right corner-->
-	      <pose frame=''>0.35 0.7 1.35 0 -0 0</pose> <!--testing depth top left corner-->
+	      <pose frame=''>0.35 0.75 1.35 0 -0 0</pose> <!--testing depth top left corner-->
 	      <!--pose frame=''>0.553 0.35 1.227 0 -0 0</pose--> <!--testing depth range-->
 	      <inertial>
 	        <mass>1</mass>

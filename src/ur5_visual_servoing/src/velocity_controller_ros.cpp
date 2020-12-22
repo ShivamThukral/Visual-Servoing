@@ -27,12 +27,18 @@ namespace gazebo {
     typedef const boost::shared_ptr<const ur5_visual_servoing::joint_vel> JointVelocityPtr;
     typedef const boost::shared_ptr<const ur5_visual_servoing::joint_angles> JointAnglePtr;
     typedef const boost::shared_ptr<const ur5_visual_servoing::sim_variables> SimVariablePtr;
-
+    /// \brief A plugin to control a arm velocity
     class VelocityControllerPlugin : public ModelPlugin {
     public:
+        /// \brief Constructor
         VelocityControllerPlugin() {}
 
     public:
+        /// \brief The load function is called by Gazebo when the plugin is
+        /// inserted into simulation
+        /// \param[in] _model A pointer to the model that this plugin is
+        /// attached to.
+        /// \param[in] _sdf A pointer to the plugin's SDF element.
         virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
             this->world = _model->GetWorld();
             this->world->SetGravity(ignition::math::Vector3d(0, 0, 0));
@@ -56,18 +62,14 @@ namespace gazebo {
             this->pid = common::PID(10, 0, 0);
 
             // Apply the P-controller to the joint.
-//            for(int i=0;i<NUM_OF_JOINTS;i++)
-//            {
-//                this->model->GetJointController()->SetVelocityPID(this->joints[i]->GetScopedName(), this->pid);
-//                this->model->GetJointController()->SetVelocityTarget(this->joints[i]->GetScopedName(), 0);
-//            }
             this->model->GetJointController()->SetVelocityPID(this->joints[0]->GetScopedName(), this->pid);
             this->model->GetJointController()->SetVelocityPID(this->joints[1]->GetScopedName(), this->pid);
             this->model->GetJointController()->SetVelocityPID(this->joints[2]->GetScopedName(), this->pid);
             this->model->GetJointController()->SetVelocityPID(this->joints[3]->GetScopedName(), this->pid);
             this->model->GetJointController()->SetVelocityPID(this->joints[4]->GetScopedName(), this->pid);
             this->model->GetJointController()->SetVelocityPID(this->joints[5]->GetScopedName(), this->pid);
-
+            // Set the joint's target velocity. This target velocity is just
+            // for demonstration purposes.
             this->model->GetJointController()->SetVelocityTarget(this->joints[0]->GetScopedName(), 0);
             this->model->GetJointController()->SetVelocityTarget(this->joints[1]->GetScopedName(), 0);
             this->model->GetJointController()->SetVelocityTarget(this->joints[2]->GetScopedName(), 0);

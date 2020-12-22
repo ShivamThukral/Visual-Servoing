@@ -118,7 +118,7 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
-      <plugin name='ball_animation_plugin' filename='libball_animation_plugin.so'/>
+      <plugin name='ping_pong_ball_plugin' filename='libping_pong_ball_plugin.so'/>
     </model>
     <gravity>0 0 0</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
@@ -1211,7 +1211,7 @@
           <always_on>1</always_on>
           <update_rate>10</update_rate>
           <camera name='__default__'>
-            <horizontal_fov>1.0472</horizontal_fov>
+            <horizontal_fov>1.57</horizontal_fov>
             <image>
               <width>640</width>
               <height>480</height>
@@ -1274,35 +1274,35 @@
       <pose frame=''>0.109144 -0.070966 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>620 154000000</sim_time>
-      <real_time>295 604503583</real_time>
-      <wall_time>1607328464 737866306</wall_time>
-      <iterations>294346</iterations>
+      <sim_time>687 238000000</sim_time>
+      <real_time>67 380939512</real_time>
+      <wall_time>1608074658 755379695</wall_time>
+      <iterations>67084</iterations>
       <model name='Ping Pong Table'>
-        <pose frame=''>-0.517885 1.22356 0 0 -0 0</pose>
+        <pose frame=''>-0.517885 0.772926 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='table'>
-          <pose frame=''>-0.517885 1.22356 0 0 -0 0</pose>
+          <pose frame=''>-0.517885 0.772926 0 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='Ping Pong Table_0'>
-        <pose frame=''>0.819998 3.36844 0 0 0 -3.13354</pose>
+        <pose frame=''>0.82355 2.92733 0 0 0 -3.13354</pose>
         <scale>1 1 1</scale>
         <link name='table'>
-          <pose frame=''>0.819998 3.36844 0 0 0 -3.13354</pose>
+          <pose frame=''>0.82355 2.92733 0 0 0 -3.13354</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='box'>
-        <pose frame=''>0.254022 0.975234 1.15551 0.000866 0.00135 1.56902</pose>
+        <pose frame=''>0.749661 0.975234 1.40007 -0.00135 0.000866 -0.001676</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>0.254022 0.975234 1.15551 0.000866 0.00135 1.56902</pose>
+          <pose frame=''>0.749661 0.975234 1.40007 -0.00135 0.000866 -0.001676</pose>
           <velocity>-0.339085 0.234396 0.067695 -1.34931 0.867016 -1.67584</velocity>
           <acceleration>0 0 0 -0 -0 -0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -1324,62 +1324,62 @@
         <link name='base_stand::ground_base_link'>
           <pose frame=''>0.109144 -0.070966 0.1 0 -0 0</pose>
           <velocity>0 0 -0 0 -0 0</velocity>
-          <acceleration>0 0 -0 0 -0 0</acceleration>
-          <wrench>0 0 -0 0 -0 0</wrench>
+          <acceleration>0 0 0 -0 -0 -0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
         </link>
         <link name='base_stand::upper_base_link'>
           <pose frame=''>0.109144 -0.070966 0.7 0 -0 0</pose>
-          <velocity>0 -0 -0 -0 -0 -0</velocity>
-          <acceleration>-0 0 -0 0 -0 0</acceleration>
-          <wrench>-0 0 -0 0 -0 0</wrench>
+          <velocity>0 0 -0 0 -0 0</velocity>
+          <acceleration>0 -0 0 0 -0 0</acceleration>
+          <wrench>0 -0 0 0 -0 0</wrench>
         </link>
         <link name='ur5::base_link'>
           <pose frame=''>0.109144 -0.070966 1.2 0 -0 0</pose>
-          <velocity>0 0 -0 0 -0 0</velocity>
-          <acceleration>0 0 -0 0 -0 0</acceleration>
-          <wrench>0 0 -0 0 -0 0</wrench>
-        </link>
-        <link name='ur5::camera_link'>
-          <pose frame=''>0.553465 0.134037 1.22757 -4.7e-05 0 1.57001</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>-0 -0 -0 0 -0 0</acceleration>
-          <wrench>-0 -0 -0 0 -0 0</wrench>
-        </link>
-        <link name='ur5::forearm_link'>
-          <pose frame=''>0.338764 -0.054814 1.64679 3.14159 0.570836 -3.14159</pose>
-          <velocity>-0 0 0 0 -0 0</velocity>
-          <acceleration>0 -0 -0 0 -0 0</acceleration>
-          <wrench>0 -0 -0 0 -0 0</wrench>
-        </link>
-        <link name='ur5::shoulder_link'>
-          <pose frame=''>0.109144 -0.070966 1.28916 0 -0 7e-06</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
+          <velocity>0 -0 -0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
-        <link name='ur5::upper_arm_link'>
-          <pose frame=''>0.109143 0.064884 1.28916 -0 0.570779 7e-06</pose>
-          <velocity>-0 0 0 0 -0 0</velocity>
-          <acceleration>-0 0 0 0 -0 0</acceleration>
-          <wrench>-0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='ur5::wrist_1_link'>
-          <pose frame=''>0.550713 -0.054813 1.31673 3.14159 4.7e-05 -3.14159</pose>
+        <link name='ur5::camera_link'>
+          <pose frame=''>0.553456 0.134034 1.22756 0 -0 1.57</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 -0 -0 0 -0 0</acceleration>
           <wrench>0 -0 -0 0 -0 0</wrench>
         </link>
-        <link name='ur5::wrist_2_link'>
-          <pose frame=''>0.550712 0.038187 1.31673 3.14159 4.7e-05 -3.14159</pose>
+        <link name='ur5::forearm_link'>
+          <pose frame=''>0.338772 -0.054816 1.64678 3.14159 0.57079 3.14159</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>-0 -0 -0 0 -0 0</acceleration>
           <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
-        <link name='ur5::wrist_3_link'>
-          <pose frame=''>0.550716 0.038187 1.22208 3.14159 4.7e-05 -3.14159</pose>
+        <link name='ur5::shoulder_link'>
+          <pose frame=''>0.109144 -0.070966 1.28916 -0 -0 -0</pose>
+          <velocity>0 -0 0 0 -0 0</velocity>
+          <acceleration>0 0 -0 0 -0 0</acceleration>
+          <wrench>0 0 -0 0 -0 0</wrench>
+        </link>
+        <link name='ur5::upper_arm_link'>
+          <pose frame=''>0.109144 0.064884 1.28916 0 0.570803 0</pose>
+          <velocity>-0 0 0 0 -0 0</velocity>
+          <acceleration>-0 -0 0 0 -0 0</acceleration>
+          <wrench>-0 -0 0 0 -0 0</wrench>
+        </link>
+        <link name='ur5::wrist_1_link'>
+          <pose frame=''>0.550706 -0.054816 1.31672 3.14159 -0 3.14159</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>-0 -0 -0 0 -0 0</acceleration>
           <wrench>-0 -0 -0 0 -0 0</wrench>
+        </link>
+        <link name='ur5::wrist_2_link'>
+          <pose frame=''>0.550706 0.038184 1.31672 3.14159 -0 3.14159</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 -0 0 -0 0</acceleration>
+          <wrench>0 0 -0 0 -0 0</wrench>
+        </link>
+        <link name='ur5::wrist_3_link'>
+          <pose frame=''>0.550706 0.038184 1.22207 3.14159 -0 3.14159</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 -0 -0 0 -0 0</acceleration>
+          <wrench>0 -0 -0 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
@@ -1388,7 +1388,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>-7.31139 4.23016 2.49017 0 0.083643 0.016185</pose>
+        <pose frame=''>-7.27854 2.20068 2.49017 0 0.083643 0.016185</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

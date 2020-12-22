@@ -631,7 +631,7 @@ void newConvertVelEEtoBaseframe(cv::Mat Ve,cv::Mat Vb)
 
     //cout << "end-eff vel " << Ve << endl;
 
-    Mat homoTransform = Mat::eye(4, 4, CV_64F);
+    Mat homoTransform = Mat::eye(4, 4, CV_64F);  // 4x4 identiy matrix
     double th[6]={jp1, jp2, jp3, jp4, jp5, jp6};
     //cout << "current joint angles " << jp1 << " " << jp2 << " " << jp3 << " " << jp4 << " " << jp5 << " " << jp6 << endl;
     newgetFKnumerical(th,homoTransform,false);
